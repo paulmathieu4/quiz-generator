@@ -17,7 +17,7 @@ async function navigateToQuiz() {
             <template v-slot:prepend>
                 <v-icon color="pink-accent-1"></v-icon>
             </template>
-            Generate Quiz
+            Go to Quiz
         </v-btn>
     </div>
 </template>
