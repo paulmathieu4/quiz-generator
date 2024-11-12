@@ -1,22 +1,43 @@
 <script setup lang="ts">
 
-import { QuizQuestion } from '@/api/api.model';
+import { QuizQuestion, QuizQuestionEnhanced } from '@/api/api.model';
 import { generateQuiz } from '@/api/api';
 
 const quizForm = ref(null);
-const userAnswers = ref(['Paris', 'Africa', 'Amazon']);
+const userAnswers: Ref<string[]> = ref(null);
+const questions: Ref<QuizQuestionEnhanced[]> = ref(null);
 
 onMounted(() => {
     generateQuestions();
 })
 
 async function generateQuestions() {
-    const questions: QuizQuestion[] = await generateQuiz();
-    console.log('generated questions: ', questions);
+    const rawQuestions: QuizQuestion[] = await generateQuiz();
+    questions.value = rawQuestions.map(question => enhanceQuestion(question));
+    userAnswers.value = questions.value.map(question => question.allAnswers[0]);
+    console.log('generated enhanced questions: ', questions.value);
 }
 
 async function logFormValue() {
     console.log('userAnswers: ', userAnswers.value);
+}
+
+function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
+    const correctAnswerRandomIndex = Math.floor(Math.random() * 4);
+    const allAnswers: string[] = [];
+    let wrongAnswerIndex = 0;
+    for (let i = 0; i < 4; i++) {
+        if (i === correctAnswerRandomIndex) {
+            allAnswers.push(question.correctAnswer)
+        } else {
+            allAnswers.push(question.wrongAnswers[wrongAnswerIndex]);
+            wrongAnswerIndex++;
+        }
+    }
+    return {
+        ...question,
+        allAnswers
+    };
 }
 </script>
 
@@ -31,36 +52,19 @@ async function logFormValue() {
         border
         rounded
     >
-        <v-form id="quiz-form" ref="quizForm" class="mt-2">
-            <div class="text-h5 mb-1">
-                What is the capital city of France?
-            </div>
-            <v-radio-group v-model="userAnswers[0]">
-                <v-radio color="primary" label="Paris" value="Paris"></v-radio>
-                <v-radio color="primary" label="Berlin" value="Berlin"></v-radio>
-                <v-radio color="primary" label="Madrid" value="Madrid"></v-radio>
-                <v-radio color="primary" label="Rome" value="Rome"></v-radio>
-            </v-radio-group>
-            <v-divider class="border-opacity-25 mb-6"></v-divider>
-            <div class="text-h5 mb-1">
-                Which continent is the Sahara Desert located on?
-            </div>
-            <v-radio-group v-model="userAnswers[1]">
-                <v-radio color="primary" label="Africa" value="Africa"></v-radio>
-                <v-radio color="primary" label="Asia" value="Asia"></v-radio>
-                <v-radio color="primary" label="Australia" value="Australia"></v-radio>
-                <v-radio color="primary" label="North America" value="North America"></v-radio>
-            </v-radio-group>
-            <v-divider class="border-opacity-25 mb-6"></v-divider>
-            <div class="text-h5 mb-1">
-                What river is the longest in the world?
-            </div>
-            <v-radio-group v-model="userAnswers[2]">
-                <v-radio color="primary" label="Amazon" value="Amazon"></v-radio>
-                <v-radio color="primary" label="Yangtze" value="Yangtze"></v-radio>
-                <v-radio color="primary" label="Nile" value="Nile"></v-radio>
-                <v-radio color="primary" label="Mississippi" value="Mississippi"></v-radio>
-            </v-radio-group>
+        <v-form v-if="questions" id="quiz-form" ref="quizForm" class="mt-2">
+            <template v-for="(question, questionIndex) of questions">
+                <div class="text-h5 mb-1">
+                    {{ question.question }}
+                </div>
+                <v-radio-group v-model="userAnswers[questionIndex]">
+                    <v-radio v-for="choice of question.allAnswers" color="primary" :label="choice"
+                             :value="choice"></v-radio>
+                </v-radio-group>
+                <v-divider v-if="questionIndex !== questions.length - 1"
+                           class="border-opacity-25 mb-6"></v-divider>
+            </template>
+
         </v-form>
     </v-sheet>
     <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary" size="x-large" stacked>

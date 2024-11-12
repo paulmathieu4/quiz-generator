@@ -8,3 +8,7 @@ export interface QuizQuestion {
     "wrongAnswers": string[];
 }
 
+export interface QuizQuestionEnhanced extends QuizQuestion {
+    "allAnswers": string[];
+}
+
