@@ -22,7 +22,7 @@ Ensure you have the following installed on your system:
 
 ```bash
   cd functions
-  firebase emulators:start
+  firebase emulators:start --only functions
   #then in separate console window
   cd functions
   pnpm build:watch

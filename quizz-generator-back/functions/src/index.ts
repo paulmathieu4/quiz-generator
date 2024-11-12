@@ -20,9 +20,16 @@ import { chatGptResponseFormat } from './chatGptResponseFormat';
 export const generateQuiz = onRequest(async (request, response) => {
     logger.info("Hello logs!", {structuredData: true});
 
+    if (!request.query?.questions || !request.query?.subject || !request.query?.difficulty) {
+        const errorMessage = 'Missing mandatory parameters when calling generateQuiz';
+        logger.error(errorMessage);
+        response.status(400).send(errorMessage)
+    }
+
     const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
     });
+    const chatGptPrompt = `I want you to generate a multiple-choice questionnaire. The questionnaire should have ${request.query.questions} questions of ${request.query?.difficulty} difficulty about ${request.query.subject}. For each question, there should be 1 correct answer, and 3 wrong answers.`
 
     try {
         const apiResponse = await openai.chat.completions.create({
@@ -33,7 +40,7 @@ export const generateQuiz = onRequest(async (request, response) => {
                     "content": [
                         {
                             "type": "text",
-                            "text": "I want you to generate a multiple-choice questionnaire. The questionnaire should have 5 simple questions about geography. For each question, there should be 1 correct answer, and 3 wrong answers."
+                            "text": chatGptPrompt
                         }
                     ]
                 }
