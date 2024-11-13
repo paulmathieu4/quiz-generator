@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-app-bar :elevation="1">
+        <v-app-bar :elevation="1" color="primary">
             <template v-slot:prepend>
                 <RouterLink to="/">
                     <v-img

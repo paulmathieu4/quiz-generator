@@ -9,6 +9,7 @@ const questions: Ref<QuizQuestionEnhanced[]> = ref(null);
 const numberOfQuestions = ref(10);
 const difficulty: Ref<QuizDifficulty> = ref(QuizDifficulty.Medium);
 const subject: Ref<QuizSubject> = ref(QuizSubject.Geo);
+const isVerified = ref(false);
 
 
 async function generateQuestions() {
@@ -40,9 +41,8 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
 
 <template>
     <v-sheet
-        color="grey"
-        class="mt-6 pa-4 mx-auto"
-        :elevation="2"
+        class="my-6 pa-4 mx-auto"
+        elevation="4"
         :max-width="800"
         border
         rounded
@@ -80,12 +80,35 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
                 </div>
                 <v-radio-group v-model="userAnswers[questionIndex]">
                     <v-radio v-for="choice of question.allAnswers" color="primary" :label="choice"
-                             :value="choice"></v-radio>
+                             :value="choice">
+                        <template v-slot:label>
+                            <div>{{ choice }}</div>
+                            <v-chip
+                                v-if="isVerified && choice === question.correctAnswer"
+                                class="ma-2"
+                                color="success"
+                                label
+                            >
+                                <v-icon icon="mdi-check-bold" start></v-icon>
+                                Réponse correcte
+                            </v-chip>
+                            <v-chip
+                                v-if="isVerified && userAnswers[questionIndex] === choice && choice !== question.correctAnswer"
+                                class="ma-2"
+                                color="error"
+                                label
+                            >
+                                <v-icon icon="mdi-alert-box-outline" start></v-icon>
+                                Mauvaise réponse
+                            </v-chip>
+                        </template>
+                    </v-radio>
                 </v-radio-group>
                 <v-divider v-if="questionIndex !== questions.length - 1"
                            class="border-opacity-25 mb-6"></v-divider>
             </template>
-            <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary" size="x-large" stacked>
+            <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary" size="x-large" stacked
+                   @click="() => isVerified=true">
                 Valider
             </v-btn>
         </v-form>
