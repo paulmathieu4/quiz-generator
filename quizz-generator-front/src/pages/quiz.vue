@@ -5,18 +5,24 @@ import { generateQuiz } from '@/api/api';
 
 const userAnswers: Ref<string[]> = ref(null);
 const questions: Ref<QuizQuestionEnhanced[]> = ref(null);
-
 const numberOfQuestions = ref(10);
 const difficulty: Ref<QuizDifficulty> = ref(QuizDifficulty.Medium);
 const subject: Ref<QuizSubject> = ref(QuizSubject.Geo);
 const isVerified = ref(false);
+const quizLoading = ref(false);
 
 
 async function generateQuestions() {
-    const rawQuestions: QuizQuestion[] = await generateQuiz(numberOfQuestions.value, subject.value, difficulty.value);
-    questions.value = rawQuestions.map(question => enhanceQuestion(question));
-    userAnswers.value = questions.value.map(question => question.allAnswers[0]);
-    console.log('generated enhanced questions: ', questions.value);
+    quizLoading.value = true;
+    try {
+        const rawQuestions: QuizQuestion[] = await generateQuiz(numberOfQuestions.value, subject.value, difficulty.value);
+        questions.value = rawQuestions.map(question => enhanceQuestion(question));
+        userAnswers.value = questions.value.map(question => question.allAnswers[0]);
+        console.log('generated enhanced questions: ', questions.value);
+    } finally {
+        quizLoading.value = false;
+    }
+
 }
 
 
@@ -76,14 +82,15 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
                     :items="[5, 10, 20]"
                 >
                 </v-select>
-                <div class="d-flex justify-center">
-                    <v-btn prepend-icon="mdi-brain" color="primary" size="x-large" stacked
+                <div class="d-flex flex-column align-center">
+                    <v-btn prepend-icon="mdi-brain" color="primary" size="x-large" stacked :loading="quizLoading"
                            @click.prevent="generateQuestions">
                         <template v-slot:prepend>
                             <v-icon color="pink-accent-1"></v-icon>
                         </template>
                         Generate Quiz
                     </v-btn>
+                    <div class="mt-2 text-caption">Powered by ChatGPT.</div>
                 </div>
             </v-form>
 
