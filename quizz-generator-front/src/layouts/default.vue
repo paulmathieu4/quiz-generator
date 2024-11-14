@@ -10,7 +10,7 @@
                 </RouterLink>
 
             </template>
-            <v-app-bar-title>ChatGPT Quiz Generator</v-app-bar-title>
+            <v-app-bar-title>Quiz Master by Paul MATHIEU</v-app-bar-title>
         </v-app-bar>
         <v-main>
             <router-view/>

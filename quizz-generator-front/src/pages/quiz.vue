@@ -47,12 +47,23 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
         border
         rounded
     >
-        <div v-if="!questions" class="fill-height d-flex justify-center align-center">
+        <div v-if="!questions" class="fill-height d-flex justify-center">
             <v-form>
+                <h1 class="text-center mb-2">
+                    Choose Your Quiz
+                </h1>
                 <v-select
                     label="Subject"
                     v-model="subject"
-                    :items="[QuizSubject.Geo,QuizSubject.History]"
+                    :items="[
+                        QuizSubject.Geo,
+                        QuizSubject.History,
+                        QuizSubject.FunFacts,
+                        QuizSubject.Animals,
+                        QuizSubject.CarAndMecanics,
+                        QuizSubject.Technology,
+                        QuizSubject.Sport,
+                        QuizSubject.Health]"
                 ></v-select>
                 <v-select
                     label="Difficulty"
@@ -63,13 +74,17 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
                     label="Number of questions"
                     v-model.number="numberOfQuestions"
                     :items="[5, 10, 20]"
-                ></v-select>
-                <v-btn prepend-icon="mdi-brain" color="primary" size="x-large" stacked @click="generateQuestions">
-                    <template v-slot:prepend>
-                        <v-icon color="pink-accent-1"></v-icon>
-                    </template>
-                    Generate Quiz
-                </v-btn>
+                >
+                </v-select>
+                <div class="d-flex justify-center">
+                    <v-btn prepend-icon="mdi-brain" color="primary" size="x-large" stacked
+                           @click.prevent="generateQuestions">
+                        <template v-slot:prepend>
+                            <v-icon color="pink-accent-1"></v-icon>
+                        </template>
+                        Generate Quiz
+                    </v-btn>
+                </div>
             </v-form>
 
         </div>

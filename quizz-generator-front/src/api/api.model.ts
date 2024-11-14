@@ -14,7 +14,13 @@ export interface QuizQuestionEnhanced extends QuizQuestion {
 
 export enum QuizSubject {
     Geo = 'geography',
-    History = 'history'
+    History = 'history',
+    Animals = 'animals',
+    CarAndMecanics = 'car and mechanics',
+    FunFacts = 'fun facts',
+    Technology = 'technology',
+    Sport = 'sport',
+    Health = 'health',
 }
 
 export enum QuizDifficulty {
