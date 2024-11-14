@@ -90,7 +90,7 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
                                 label
                             >
                                 <v-icon icon="mdi-check-bold" start></v-icon>
-                                Réponse correcte
+                                Correct answer
                             </v-chip>
                             <v-chip
                                 v-if="isVerified && userAnswers[questionIndex] === choice && choice !== question.correctAnswer"
@@ -99,7 +99,7 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
                                 label
                             >
                                 <v-icon icon="mdi-alert-box-outline" start></v-icon>
-                                Mauvaise réponse
+                                Wrong answer
                             </v-chip>
                         </template>
                     </v-radio>
@@ -109,7 +109,7 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
             </template>
             <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary" size="x-large" stacked
                    @click="() => isVerified=true">
-                Valider
+                Verify
             </v-btn>
         </v-form>
 
