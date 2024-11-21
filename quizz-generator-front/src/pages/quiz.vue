@@ -1,21 +1,48 @@
 <script setup lang="ts">
 
-import { QuizDifficulty, QuizQuestion, QuizQuestionEnhanced, QuizSubject } from '@/api/api.model';
+import { QuizQuestion, QuizQuestionEnhanced } from '@/api/api.model';
 import { generateQuiz } from '@/api/api';
+import colors from 'vuetify/util/colors'
+import { myCustomDarkTheme } from '@/plugins/vuetify';
+
+const router = useRouter();
+const route = useRoute();
 
 const userAnswers: Ref<string[]> = ref(null);
 const questions: Ref<QuizQuestionEnhanced[]> = ref(null);
-const numberOfQuestions = ref(10);
-const difficulty: Ref<QuizDifficulty> = ref(QuizDifficulty.Medium);
-const subject: Ref<QuizSubject> = ref(QuizSubject.Geo);
 const isVerified = ref(false);
-const quizLoading = ref(false);
+const quizLoading = ref(true);
 
+const numberOfRightAnswsers = computed(() => {
+    let result = 0;
+    for (let index = 0; index < userAnswers.value.length; index++) {
+        if (userAnswers.value[index] === questions.value[index].correctAnswer) {
+            result++;
+        }
+    }
+    return result;
+})
+
+const numberOfWrongAnswsers = computed(() => {
+    let result = 0;
+    for (let index = 0; index < userAnswers.value.length; index++) {
+        if (userAnswers.value[index] !== questions.value[index].correctAnswer) {
+            result++;
+        }
+    }
+    return result;
+})
+
+const goodAnswersPercentage = computed(() => {
+    return Math.ceil(numberOfRightAnswsers.value / (numberOfRightAnswsers.value + numberOfWrongAnswsers.value) * 100)
+})
+
+generateQuestions();
 
 async function generateQuestions() {
     quizLoading.value = true;
     try {
-        const rawQuestions: QuizQuestion[] = await generateQuiz(numberOfQuestions.value, subject.value, difficulty.value);
+        const rawQuestions: QuizQuestion[] = await generateQuiz(route.query.numberOfQuestions, route.query.subject, route.query.difficulty);
         questions.value = rawQuestions.map(question => enhanceQuestion(question));
         userAnswers.value = questions.value.map(question => question.allAnswers[0]);
         console.log('generated enhanced questions: ', questions.value);
@@ -43,6 +70,16 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
         allAnswers
     };
 }
+
+function goToNewQuiz() {
+    router.push('/quiz/create');
+}
+
+function computePercentStyle(value: number) {
+    return {
+        color: value >= 80 ? myCustomDarkTheme.colors.success : value >= 60 ? myCustomDarkTheme.colors.warning : myCustomDarkTheme.colors.error,
+    };
+}
 </script>
 
 <template>
@@ -53,48 +90,18 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
         border
         rounded
     >
-        <div v-if="!questions" class="fill-height d-flex justify-center">
-            <v-form>
-                <h1 class="text-center mb-2">
-                    Choose Your Quiz
-                </h1>
-                <v-select
-                    label="Subject"
-                    v-model="subject"
-                    :items="[
-                        QuizSubject.Geo,
-                        QuizSubject.History,
-                        QuizSubject.FunFacts,
-                        QuizSubject.Animals,
-                        QuizSubject.CarAndMecanics,
-                        QuizSubject.Technology,
-                        QuizSubject.Sport,
-                        QuizSubject.Health]"
-                ></v-select>
-                <v-select
-                    label="Difficulty"
-                    v-model="difficulty"
-                    :items="[QuizDifficulty.Easy, QuizDifficulty.Medium, QuizDifficulty.Hard]"
-                ></v-select>
-                <v-select
-                    label="Number of questions"
-                    v-model.number="numberOfQuestions"
-                    :items="[5, 10, 20]"
-                >
-                </v-select>
-                <div class="d-flex flex-column align-center">
-                    <v-btn prepend-icon="mdi-brain" color="primary" size="x-large" stacked :loading="quizLoading"
-                           @click.prevent="generateQuestions">
-                        <template v-slot:prepend>
-                            <v-icon color="pink-accent-1"></v-icon>
-                        </template>
-                        Generate Quiz
-                    </v-btn>
-                    <div class="mt-2 text-caption">Powered by ChatGPT.</div>
-                </div>
-            </v-form>
+        <v-container v-if="quizLoading">
+            <div class="text-h5 text-center mb-4">
+                Generating quiz
+                <v-progress-circular
+                    class="ml-2"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
+            </div>
+            <v-skeleton-loader color="primary" type="article"></v-skeleton-loader>
+        </v-container>
 
-        </div>
         <v-form v-else id="quiz-form">
             <template v-for="(question, questionIndex) of questions">
                 <div class="text-h5 mb-1">
@@ -129,10 +136,26 @@ function enhanceQuestion(question: QuizQuestion): QuizQuestionEnhanced {
                 <v-divider v-if="questionIndex !== questions.length - 1"
                            class="border-opacity-25 mb-6"></v-divider>
             </template>
-            <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary" size="x-large" stacked
+            <v-divider :thickness="3" class="border-opacity-25 mb-6"></v-divider>
+            <v-btn v-if="!isVerified" class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary"
+                   size="x-large" stacked
                    @click="() => isVerified=true">
                 Verify
             </v-btn>
+            <v-container v-else>
+                <div class="text-h6 text-center mb-1">
+                    You have <b
+                    :style="computePercentStyle(goodAnswersPercentage)">{{
+                        goodAnswersPercentage
+                    }}%</b>
+                    of good answers (<b>{{ numberOfWrongAnswsers }}</b> wrong answer)
+                </div>
+                <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-file-plus" color="primary" size="x-large"
+                       stacked
+                       @click="goToNewQuiz">
+                    Start another quiz
+                </v-btn>
+            </v-container>
         </v-form>
 
     </v-sheet>

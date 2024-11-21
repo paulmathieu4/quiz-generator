@@ -11,25 +11,25 @@ import 'vuetify/styles'
 // Composables
 import { createVuetify } from 'vuetify'
 
-const myCustomLightTheme = {
-    dark: false,
+export const myCustomDarkTheme = {
+    dark: true,
     colors: {
-        primary: '#00bcd4',
-        secondary: '#ffc107',
-        accent: '#ff5722',
-        error: '#f44336',
+        primary: '#7A3AC5',
+        secondary: '#655A70',
+        accent: '#E5CDFC',
+        error: '#BA1B1B',
         warning: '#ff9800',
-        info: '#009688',
-        success: '#4caf50'
+        info: '#02baa9',
+        success: '#74c578'
     }
 }
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
     theme: {
-        defaultTheme: 'myCustomLightTheme',
+        defaultTheme: 'myCustomDarkTheme',
         themes: {
-            myCustomLightTheme,
+            myCustomDarkTheme,
         },
     },
 

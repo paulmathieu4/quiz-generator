@@ -6,7 +6,7 @@ const router = useRouter();
 
 
 async function navigateToQuiz() {
-    router.push('/quiz')
+    router.push('/quiz/create')
 }
 
 </script>
