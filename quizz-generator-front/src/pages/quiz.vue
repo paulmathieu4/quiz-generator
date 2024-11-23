@@ -43,7 +43,7 @@ async function generateQuestions() {
     try {
         const rawQuestions: QuizQuestion[] = await generateQuiz(route.query.numberOfQuestions, route.query.subject, route.query.difficulty);
         questions.value = rawQuestions.map(question => enhanceQuestion(question));
-        userAnswers.value = questions.value.map(question => question.allAnswers[0]);
+        userAnswers.value = Array(questions.value.length).fill(null);
         console.log('generated enhanced questions: ', questions.value);
     } finally {
         quizLoading.value = false;
