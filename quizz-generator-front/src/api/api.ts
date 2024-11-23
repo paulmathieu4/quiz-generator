@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 import { GenerateQuizResponse, QuizDifficulty, QuizQuestion, QuizSubject } from '@/api/api.model';
 
 export const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:5001/quiz-generator-9f264/us-central1', // Replace with your API URL
+    baseURL: import.meta.env.VITE_URL_GENERATE_QUIZ,
     headers: {
         'Content-Type': 'application/json',
     },

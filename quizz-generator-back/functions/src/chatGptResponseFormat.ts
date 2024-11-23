@@ -11,28 +11,28 @@ export const chatGptResponseFormat = {
                     "type": "object",
                     "properties": {
                         "question": {
-                            "type": "string"
+                            "type": "string",
                         },
                         "correctAnswer": {
-                            "type": "string"
+                            "type": "string",
                         },
                         "wrongAnswers": {
                             "type": "array",
                             "items": {
-                                "type": "string"
-                            }
-                        }
+                                "type": "string",
+                            },
+                        },
                     },
                     "required": [
                         "question",
                         "correctAnswer",
-                        "wrongAnswers"
-                    ]
-                }
-            }
+                        "wrongAnswers",
+                    ],
+                },
+            },
         },
         "required": [
-            "questionnaire"
-        ]
-    }
+            "questionnaire",
+        ],
+    },
 };

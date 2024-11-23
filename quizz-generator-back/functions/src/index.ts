@@ -10,7 +10,7 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import OpenAI from "openai";
-import { chatGptResponseFormat } from './chatGptResponseFormat';
+import { chatGptResponseFormat } from "./chatGptResponseFormat";
 
 
 // Start writing functions
@@ -45,7 +45,7 @@ export const generateQuiz = onRequest(async (request, response) => {
                     ]
                 }
             ],
-            temperature: 1,
+            temperature: 1.2,
             max_tokens: 2048,
             top_p: 1,
             frequency_penalty: 0,
