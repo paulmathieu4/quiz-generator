@@ -17,50 +17,60 @@ import { chatGptResponseFormat } from "./chatGptResponseFormat";
 // https://firebase.google.com/docs/functions/typescript
 
 /* eslint-disable */
-export const generateQuiz = onRequest(async (request, response) => {
-    logger.info("Hello logs!", {structuredData: true});
+export const generateQuiz = onRequest({cors: [/quiz-generator-front\.web\.app$/]}, async (request, response) => {
 
-    if (!request.query?.questions || !request.query?.subject || !request.query?.difficulty) {
-        const errorMessage = 'Missing mandatory parameters when calling generateQuiz';
-        logger.error(errorMessage);
-        response.status(400).send(errorMessage)
-    }
+            const allowedOrigin = "https://quiz-generator-front.web.app";
+            const referer = request.headers.referer;
+            const isProduction = process.env.FUNCTIONS_EMULATOR !== "true";
+            if (isProduction && (!referer || !referer.startsWith(allowedOrigin))) {
+                const errorMessage = 'Forbidden: Invalid Referer';
+                logger.error(errorMessage);
+                response.status(403).send(errorMessage);
+            }
 
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-    });
-    const chatGptPrompt = `I want you to generate a multiple-choice questionnaire. The questionnaire should have ${request.query.questions} questions of ${request.query?.difficulty} difficulty about ${request.query.subject}. For each question, there should be 1 correct answer, and 3 wrong answers.`
+            if (!request.query?.questions || !request.query?.subject || !request.query?.difficulty) {
+                const errorMessage = 'Missing mandatory parameters when calling generateQuiz';
+                logger.error(errorMessage);
+                response.status(400).send(errorMessage)
+            }
 
-    try {
-        const apiResponse = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    "role": "user",
-                    "content": [
+            const openai = new OpenAI({
+                apiKey: process.env.OPENAI_API_KEY,
+            });
+            const chatGptPrompt = `I want you to generate a multiple-choice questionnaire. The questionnaire should have ${request.query.questions} questions of ${request.query?.difficulty} difficulty about ${request.query.subject}. For each question, there should be 1 correct answer, and 3 wrong answers.`
+
+            try {
+                const apiResponse = await openai.chat.completions.create({
+                    model: "gpt-4o-mini",
+                    messages: [
                         {
-                            "type": "text",
-                            "text": chatGptPrompt
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": chatGptPrompt
+                                }
+                            ]
                         }
-                    ]
-                }
-            ],
-            temperature: 1.2,
-            max_tokens: 2048,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0,
-            response_format: {
-                "type": "json_schema",
-                "json_schema": chatGptResponseFormat
-            },
-        });
+                    ],
+                    temperature: 1.2,
+                    max_tokens: 2048,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0,
+                    response_format: {
+                        "type": "json_schema",
+                        "json_schema": chatGptResponseFormat
+                    },
+                });
 
-        logger.info(`chatAPI request ID: ${apiResponse._request_id}`)
-        const quiz = JSON.parse(apiResponse.choices[0].message.content as string);
-        response.send(quiz);
-    } catch (e) {
-        logger.error('Error when calling openAI completions API: ', e);
-        response.status(500).send('Internal server error')
-    }
-});
+                logger.info(`chatAPI request ID: ${apiResponse._request_id}`)
+                const quiz = JSON.parse(apiResponse.choices[0].message.content as string);
+                response.send(quiz);
+            } catch (e) {
+                logger.error('Error when calling openAI completions API: ', e);
+                response.status(500).send('Internal server error')
+            }
+        }
+    )
+;
