@@ -112,11 +112,11 @@ function onVerifyClick() {
 
         <v-form v-else id="quiz-form">
             <template v-for="(question, questionIndex) of questions">
-                <div class="text-h5 mb-1">
+                <div class="text-h5 mb-1 quiz-question">
                     {{ question.question }}
                 </div>
                 <v-radio-group v-model="userAnswers[questionIndex]">
-                    <v-radio v-for="choice of question.allAnswers" color="primary" :label="choice"
+                    <v-radio v-for="choice of question.allAnswers" class="quiz-choice" color="primary" :label="choice"
                              :value="choice">
                         <template v-slot:label>
                             <div>{{ choice }}</div>
@@ -175,5 +175,9 @@ function onVerifyClick() {
     label {
         opacity: 1;
     }
+}
+
+.quiz-question, .quiz-choice {
+    font-family: cursive;
 }
 </style>
