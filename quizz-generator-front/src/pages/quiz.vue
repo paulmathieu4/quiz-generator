@@ -2,7 +2,6 @@
 
 import { QuizQuestion, QuizQuestionEnhanced } from '@/api/api.model';
 import { generateQuiz } from '@/api/api';
-import colors from 'vuetify/util/colors'
 import { myCustomDarkTheme } from '@/plugins/vuetify';
 
 const router = useRouter();
@@ -80,6 +79,15 @@ function computePercentStyle(value: number) {
         color: value >= 80 ? myCustomDarkTheme.colors.success : value >= 60 ? myCustomDarkTheme.colors.warning : myCustomDarkTheme.colors.error,
     };
 }
+
+function onVerifyClick() {
+    isVerified.value = true;
+    setTimeout(() => {
+        const newQuizButtonElt = document.getElementById('new-quiz-button');
+        newQuizButtonElt.scrollIntoView();
+    }, 100)
+
+}
 </script>
 
 <template>
@@ -139,7 +147,7 @@ function computePercentStyle(value: number) {
             <v-divider :thickness="3" class="border-opacity-25 mb-6"></v-divider>
             <v-btn v-if="!isVerified" class="d-block mx-auto mt-6" prepend-icon="mdi-check-all" color="primary"
                    size="x-large" stacked
-                   @click="() => isVerified=true">
+                   @click="onVerifyClick">
                 Verify
             </v-btn>
             <v-container v-else>
@@ -150,7 +158,8 @@ function computePercentStyle(value: number) {
                     }}%</b>
                     of good answers (<b>{{ numberOfWrongAnswsers }}</b> wrong answer)
                 </div>
-                <v-btn class="d-block mx-auto mt-6" prepend-icon="mdi-file-plus" color="primary" size="x-large"
+                <v-btn id="new-quiz-button" class="d-block mx-auto mt-6" prepend-icon="mdi-file-plus" color="primary"
+                       size="x-large"
                        stacked
                        @click="goToNewQuiz">
                     Start another quiz
